@@ -31,6 +31,8 @@ void demoTask3(){
 
 
 World::World(int maxX, int maxY, int nmbFiver, int nmbFourer, int nmbThreer, int nmbTwoer){
+
+	//Erzeugen des Spielfeldes, minimale Größe = 10 x 10
 	if(maxX < 10){
 		maxX_ = 10;
 	}else{
@@ -42,9 +44,11 @@ World::World(int maxX, int maxY, int nmbFiver, int nmbFourer, int nmbThreer, int
 	}else{
 		maxY_ = maxY;
 	}
+
 	nmbShips_ = nmbFiver + nmbFourer + nmbThreer + nmbTwoer;
 
-	ships_ = new Ship*[nmbShips_];
+	ships_ = new Ship*[nmbShips_];  //Array, der Schiffe enthält
+	//Schiffe werden der Größe nach in Array gespeichert
 	int idx = 0;
 	//5er
 	for(int i=0; i < nmbFiver;i++){
@@ -80,7 +84,7 @@ World::World(int maxX, int maxY, int nmbFiver, int nmbFourer, int nmbThreer, int
 Ship *World::defaultShipFactory(int nmbBlocks){
 	Ship *ship;
 	Block *block;
-
+    //Erstellen des Schiff-Objekts
 	ship = new Ship();
 	ship->state_ = INPROGRESS;
 	ship->shipname_= (ShipType) nmbBlocks;
@@ -98,6 +102,7 @@ Ship *World::defaultShipFactory(int nmbBlocks){
  *
  *
  */
+
 BlockState World::coordAlreadyUsed(int x, int y){
 	int nmbBlocks;
 	Block *block;
@@ -145,8 +150,8 @@ void World::removeAllBlockCoordFromShip(Ship *s){
 	s->state_ = INPROGRESS;
 }
 
-bool World::checkNeighborhood(int x, int y){
-	if( ((x + 1) <=maxX_) && ((x - 1) > 0) ){
+bool World::checkNeighborhood(int x, int y){        //gibt true zurück, wenn eines der Nachbarfelder von x,y belegt ist
+	if( ((x + 1) <=maxX_) && ((x - 1) > 0) ){       //Überprüfung auf legale Koordinaten
     	if(coordAlreadyUsed(x-1, y) == BLOCK_USED){ return true;};
     	if(coordAlreadyUsed(x+1, y) == BLOCK_USED){ return true;};
 	}
@@ -201,16 +206,16 @@ bool World::checkNeighborhood(int x, int y){
 }
 
 
-bool World::placeSingleShip(int idxShip){
+bool World::placeSingleShip(int idxShip){       //automatisches Platzieren eines Schiffes, zufällige Koordinaten
 	int startCoordX;
 	int startCoordY;
 	int currCoordX;
 	int currCoordY;
 	int nmbTries = 0;
-	int maxTries = 10;
+	int maxTries = 10;                          //Anzahl der Versuche zum Platzieren des Schiffs
 
 	Ship *ship = ships_[idxShip];
-	bool horizontal = ((rand()%2) == 0);
+	bool horizontal = ((rand()%2) == 0);        //zufällige Zuordnung, ob horizontal oder vertikal
 
     // temporary storage for new blocks
     Block tmpBlocks[ship->nmbBlocks_];
@@ -218,11 +223,11 @@ bool World::placeSingleShip(int idxShip){
 	bool shipCompleted = false;
 	do{ // get rand start coordinates
 		nmbTries++;
-		if(nmbTries > maxTries) return false; // give up no place for ship found
+		if(nmbTries > maxTries) return false;   // give up, no place for ship found
 
 		horizontal = ((rand()%2) == 0);
 
-		startCoordX = (rand() % maxX_) + 1;
+		startCoordX = (rand() % maxX_) + 1;     //Erzeugen zufälliger Koordinaten
 		startCoordY = (rand() % maxY_) + 1;
 
 		// check if coordinates are free
@@ -257,7 +262,7 @@ bool World::placeSingleShip(int idxShip){
 	    	}
 
 
-	    	// check coord.
+	    	// check coordinates
 	    	if(coordAlreadyUsed(currCoordX, currCoordY) == BLOCK_USED){
 	    		break;
 	    	}
@@ -292,17 +297,17 @@ ShootResult World::shoot(int x, int y){
 		return GAME_OVER;
 	}
 
-	if( (x > maxX_) || (y > maxY_) || (x < 1) || (y < 1)){
+	if( (x > maxX_) || (y > maxY_) || (x < 1) || (y < 1)){      //Überprüfen, ob Koordinate im gegebenen Spielfeld liegt
 		return WATER;
 	}
 
 	Ship *s;
 	Block *b;
-	for(int idxShp = 0; idxShp < nmbShips_; idxShp++){
+	for(int idxShp = 0; idxShp < nmbShips_; idxShp++){          //Durchlaufen des Arrays mit Schiffen
 		s = ships_[idxShp];
 		for(int idxBlk = 0; idxBlk < s->nmbBlocks_; idxBlk++){
 			b = s->blocks_[idxBlk];
-			if( (b->x_ == x) && (b->y_ == y)){
+			if( (b->x_ == x) && (b->y_ == y)){                  //Überprüfen, ob Koordinaten mit denen eines Schiffes übereinstimmen
 				b->state_ = BLOCK_HIT;
 				if(isShipStillAlive(s)){
 					return SHIP_HIT;
