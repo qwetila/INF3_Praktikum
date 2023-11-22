@@ -28,8 +28,7 @@ C++ client example using sockets
 #include <ctime> //contains various functions for manipulating date and time
 
 
-
-
+//Komentar zum Testen (kann nach dem 22.11. gelöscht werden)
 
 #include "SIMPLESOCKET.H"
 
