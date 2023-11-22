@@ -16,11 +16,11 @@ using namespace std;
 int main() {
 	srand(time(NULL));
 	TCPclient c;
-	string host = "localhost";
+	string host = "localhost";   // Zuhause könnte man für Local host eine IP einfügen
 	string msg;
 
 	//connect to host
-	c.conn(host , 2022);
+	c.conn(host , 2022); // 2022 Server Port    // Verbindung aufbauen
 
 	int i=0;
 	bool goOn=1;
@@ -32,12 +32,17 @@ int main() {
 			msg = string("client wants this");
 		}
 		cout << "client sends:" << msg << endl;
-		c.sendData(msg);
-		msg = c.receive(32);
+		c.sendData(msg);                               //Paar senden und empfangen
+		msg = c.receive(32);                           // receive wartet auf antwort! 32 gibt message size dar
 		cout << "got response:" << msg << endl;
 		sleep(1);
 
 	}
 }
+
+
+// client empfengt direkt nach senden
+// immer send receive als Paar
+// wie Ping Pong
 
 
