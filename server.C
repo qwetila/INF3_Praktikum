@@ -34,7 +34,7 @@ protected:
         while (1){
 
             if (strncmp(input.c_str(), "START", 5) == 0){       //Ersten 5 Stellen des Statements auf Gleichheit überprüfen
-                TASK3::World w(10,10,1,2,3,4);
+                myWorld(10,10,1,2,3,4);
                 myWorld.printBoard();
                 return "DONE";
             }
