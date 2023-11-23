@@ -17,6 +17,7 @@
 #include <netinet/in.h> //contains constants and structures needed for internet domain addresses
 
 #include "SIMPLESOCKET.H"
+#include "TASK3.H"
 
 
 class myServer : public TCPserver{
@@ -28,22 +29,43 @@ public:
 
 protected:
     string myResponse(string input){
-        if (strncmp(input, "START", 5) == 0){
-			//World myWorld = new World();
-		}	
-		if (strncmp(input, "GUESS", 5) == 0){				//Format: 	GUESS_X01_Y01 für Koordinaten x=1 & y=1
-			int xCoord = input[8] 	+ input[9];		//			1234567890123
-			int yCoord = input[12] 	+ input[13];
-			//Methode von TASK3 aufrufen, dafür erst World erstellen, Aufruf über myWorld
-		}
+        TASK3::World myWorld;
 
-		
-		switch(input){
-			case "NEWGAME": break;
-			case "GUESS": break;
-			case "NEWGAME": break;
-			case "NEWGAME": break;
-			 
+        while (1){
+
+            if (strncmp(input.c_str(), "START", 5) == 0){       //Ersten 5 Stellen des Statements auf Gleichheit überprüfen
+                TASK3::World w(10,10,1,2,3,4);
+                myWorld.printBoard();
+                return "DONE";
+            }
+            else if (strncmp(input.c_str(), "GUESS", 5) == 0){		//Format: 	GUESS_X01_Y01 für Koordinaten x=1 & y=1
+                int xCoord = input[8] 	+ input[9];		        //          1234567890123
+                int yCoord = input[12] 	+ input[13];
+
+                TASK3::ShootResult rsp = myWorld.shoot(xCoord, yCoord);
+
+                //Antworten überprüfen
+                if (rsp = TASK3::ShootResult::WATER){
+                    return "WATER";
+                }
+                if (rsp = TASK3::ShootResult::SHIP_HIT){
+                    return "SHIP_HIT";
+                }
+                if (rsp = TASK3::ShootResult::SHIP_DESTROYED){
+                    return "SHIP_DESTROYED";
+                }
+                if (rsp = TASK3::ShootResult::ALL_SHIPS_DESTROYED){
+                    return "ALL_SHIPS_DESTROYED";
+                }
+                if (rsp = TASK3::ShootResult::GAME_OVER){
+                    return "GAME_OVER";
+                }
+                else return "ERROR";
+
+                myWorld.printBoard();
+            }
+            else return "Fehlerhafte Eingabe";
+        }
     };
 };
 
