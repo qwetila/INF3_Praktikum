@@ -9,6 +9,7 @@
 #include <cstring> 	//contains string functions
 #include <cerrno> 	//It defines macros for reporting and retrieving error conditions through error codes
 #include <ctime> 	//contains various functions for manipulating date and time
+#include <iostream>
 
 #include <unistd.h> 	//contains various constants
 #include <sys/types.h> 	//contains a number of basic derived types that should be used whenever appropriate
@@ -19,6 +20,8 @@
 #include "SIMPLESOCKET.H"
 #include "TASK3.H"
 
+bool init = false;
+TASK3::World myWorld;
 
 class myServer : public TCPserver{
 public:
@@ -29,45 +32,76 @@ public:
 
 protected:
     string myResponse(string input){
-        TASK3::World myWorld;
 
-        while (1){
+
+
+        if (!init){
+        TASK3::World myWorld(10,10,1,2,3,4);
+        init = true;
+        }
+        while (init){
 
             if (strncmp(input.c_str(), "START", 5) == 0){       //Ersten 5 Stellen des Statements auf Gleichheit überprüfen
-                myWorld(10,10,1,2,3,4);
+                //myWorld(10,10,1,2,3,4);
                 myWorld.printBoard();
-                return "DONE";
+                return "READY";
             }
             else if (strncmp(input.c_str(), "GUESS", 5) == 0){		//Format: 	GUESS_X01_Y01 für Koordinaten x=1 & y=1
-                int xCoord = input[8] 	+ input[9];		        //          1234567890123
-                int yCoord = input[12] 	+ input[13];
+                string strInput = input.c_str();
+                char& x1 = strInput.at(7), x2 = strInput.at(8), y1 = strInput.at(11), y2 = strInput.at(12);
+                //cout << x1 << endl;
+                //cout << x2 << endl;
 
-                TASK3::ShootResult rsp = myWorld.shoot(xCoord, yCoord);
+                string sX = ""; sX = sX + x1 + x2;
+                string sY = ""; sY = sY + y1 + y2;//
+
+
+                //cout << "sx=" << sX << endl;
+                //cout << "sy=" << sY << endl;
+
+                int xCoord = stoi(sX);
+                int yCoord = stoi(sY);
+
+                //cout << "x=" << xCoord << endl;
+                //cout << "y=" << yCoord << endl;
+
+                //sleep(0.25);
+                myWorld.printBoard();
+
+                TASK3::ShootResult eRsp = myWorld.shoot(xCoord, yCoord);
+                //cout << "eRSP=" <<  eRsp << endl;
+                int rsp = int(eRsp);
+                //cout << "rsp=" << rsp << endl;
+
 
                 //Antworten überprüfen
-                if (rsp = TASK3::ShootResult::WATER){
+
+                if (rsp == TASK3::ShootResult::WATER){
+                    cout << "rsp=" << rsp << endl;
                     return "WATER";
                 }
-                if (rsp = TASK3::ShootResult::SHIP_HIT){
+                else if (rsp == TASK3::ShootResult::SHIP_HIT){
+                    cout << "rsp=" << rsp << endl;
                     return "SHIP_HIT";
                 }
-                if (rsp = TASK3::ShootResult::SHIP_DESTROYED){
+                else if (rsp == TASK3::ShootResult::SHIP_DESTROYED){
                     return "SHIP_DESTROYED";
                 }
-                if (rsp = TASK3::ShootResult::ALL_SHIPS_DESTROYED){
+                else if (rsp == TASK3::ShootResult::ALL_SHIPS_DESTROYED){
                     return "ALL_SHIPS_DESTROYED";
                 }
-                if (rsp = TASK3::ShootResult::GAME_OVER){
+                else if (rsp == TASK3::ShootResult::GAME_OVER){
+                    cout << "rsp=" << rsp << endl;
                     return "GAME_OVER";
                 }
                 else return "ERROR";
 
-                myWorld.printBoard();
             }
-            else return "Fehlerhafte Eingabe";
+            else return 0; //"Fehlerhafte Eingabe";
         }
     };
 };
+
 
 
 int main(){
