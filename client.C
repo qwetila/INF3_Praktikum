@@ -33,16 +33,9 @@ int main() {
 		}
 		cout << "client sends:" << msg << endl;
 		c.sendData(msg);                               //Paar senden und empfangen
-		msg = c.receive(32);                           // receive wartet auf antwort! 32 gibt message size dar
+		msg = c.receive(32);                           //receive wartet auf antwort! 32 gibt message size an
 		cout << "got response:" << msg << endl;
 		sleep(1);
 
 	}
 }
-
-
-// client empfengt direkt nach senden
-// immer send receive als Paar
-// wie Ping Pong
-
-

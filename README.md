@@ -1,2 +1,2 @@
 # INF3_PRAK
-Source code for practicals WS2019/2020
+Quellcode des Praktikums WS 2023/24 im Modul Informatik 3

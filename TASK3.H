@@ -18,8 +18,6 @@
 #ifndef TASK3_H_
 #define TASK3_H_
 
-
-
 #include <string>
 
 using namespace std;

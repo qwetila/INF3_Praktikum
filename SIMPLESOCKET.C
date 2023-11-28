@@ -9,36 +9,36 @@
 /**
 C++ client example using sockets
 */
-#include <iostream> //cout
-#include <cstdio> //printf
-#include <cstring> //strlen
-#include <string> //string
+#include <iostream> 	//cout
+#include <cstdio> 		//printf
+#include <cstring> 		//strlen
+#include <string> 		//string
 #include <sys/socket.h> //socket
-#include <arpa/inet.h> //inet_addr
-#include <netdb.h> //hostent
-#include <unistd.h> //contains various constants
-#include <sys/types.h> //contains a number of basic derived types that should be used whenever appropriate
+#include <arpa/inet.h> 	//inet_addr
+#include <netdb.h> 		//hostent
+#include <unistd.h> 	//contains various constants
+#include <sys/types.h> 	//contains a number of basic derived types that should be used whenever appropriate
 #include <netinet/in.h> //contains constants and structures needed for internet domain addresses
 
 
-#include <cstdio> // standard input and output library
-#include <cstdlib> // this includes functions regarding memory allocation
-#include <cstring> // contains string functions
-#include <cerrno> //It defines macros for reporting and retrieving error conditions through error codes
-#include <ctime> //contains various functions for manipulating date and time
+#include <cstdio> 		//standard input and output library
+#include <cstdlib> 		//this includes functions regarding memory allocation
+#include <cstring> 		//contains string functions
+#include <cerrno> 		//It defines macros for reporting and retrieving error conditions through error codes
+#include <ctime> 		//contains various functions for manipulating date and time
 
-
-//Komentar zum Testen (kann nach dem 22.11. gelöscht werden)
 
 #include "SIMPLESOCKET.H"
 
 using namespace std;
+
 
 TCPclient::TCPclient(){
 	sock = -1;
 	port = 0;
 	address = "";
 }
+
 
 bool TCPclient::conn(string address , int port){
 	//create socket if it is not already created
@@ -94,9 +94,12 @@ bool TCPclient::conn(string address , int port){
 	return true;
 }
 
+
 /**
 Send data to the connected host
 */
+
+
 bool TCPclient::sendData(string data){
 	//Send some data
 	if( send(sock , data.c_str() , strlen( data.c_str() ) , 0) < 0){
@@ -107,9 +110,12 @@ bool TCPclient::sendData(string data){
 	return true;
 }
 
+
 /**
 Receive data from the connected host
 */
+
+
 string TCPclient::receive(int size=512){
 	char buffer[size];
 	string reply;
@@ -122,8 +128,6 @@ string TCPclient::receive(int size=512){
 	reply = buffer;
 	return reply;
 }
-
-
 
 
 TCPserver::TCPserver(int port, int maxDataSizeRecv){
@@ -158,10 +162,10 @@ void TCPserver::run(){
  		}
 
 		read(clintConnt_,dataRecv_, (size_t)maxDataSizeRecv_);
-		output = response(string(dataRecv_));
-		dataSend_ = output.c_str();
+		output = response(string(dataRecv_));				//Aufruf Methode TCPserver::response(...), um Antworttext zu bestimmen
+		dataSend_ = output.c_str();							//Typecast auf c_str, Zuweisung an dataSend_
 		write(clintConnt_, dataSend_, strlen(dataSend_)+1);
-		if(output.compare(0,6,"BYEBYE") == 0){
+		if(output.compare(0,6,"BYEBYE") == 0){				//Prüfen auf Ende der Kommunikation
 			cout << "asked to close server\n";
 			break;
 		}
@@ -171,9 +175,11 @@ void TCPserver::run(){
 
 }
 
+
 TCPserver::~TCPserver(){
 	delete [] dataRecv_;
 }
+
 
 string TCPserver::response(string incomingMsg){
 	string msg;
@@ -182,7 +188,7 @@ string TCPserver::response(string incomingMsg){
 		msg = string("BYEBYE"); // this return value
 		                        // will close server connections
 	}else{
-		msg = myResponse(incomingMsg);
+		msg = myResponse(incomingMsg);			//Wenn Nachricht nicht BYEBYE, dann Aufruf myResponse(...)
 	}
 
 	cout << "received :" << incomingMsg << endl;
@@ -192,17 +198,6 @@ string TCPserver::response(string incomingMsg){
 }
 
 
-string TCPserver::myResponse(string input){
+string TCPserver::myResponse(string input){		//Bestimmen der Antwort
 	return string("NO DATA YET YET YET");
 }
-
-
-
-
-
-
-
-
-
-
-

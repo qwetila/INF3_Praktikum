@@ -385,6 +385,4 @@ void World::printBoard(){
 		cout << endl;
 	}
 }
-
-
 }
