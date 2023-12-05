@@ -12,17 +12,29 @@
 
 #include "SIMPLESOCKET.H"
 
-#define size_x 10
+#define size_x 10       //Festlegen der Spielfeldgröße
 #define size_y 10
+
+//*********************
+#define currentStrat 1  //Auswahl der aktuellen Lösungsstrategie
+//*********************
 
 using namespace std;
 
-int main() {
-	srand(time(NULL));
-	TCPclient c;
-	string host = "localhost";   // Zuhause könnte man für Local host eine IP einfügen
-	string msg = "START";
+string guessMsg(int x, int y){      //Konvertiert Koordinaten in String für Server: GUESS_X01_Y01
 
+    string msg = "";
+    msg = (x < 10) ? "GUESS_X0"+to_string(x) : "GUESS_X"+to_string(x);     //Anpassung der einstelligen Zahlen auf zwei Stellen
+    msg = (y < 10) ? msg + "_Y0"+to_string(y) : msg +"_Y"+to_string(y);
+    return msg;
+}
+
+void strat_1(){      //chronologisches Abarbeiten der Koordinaten: X01_Y01 bis X01_Y10, X02_Y01 bis X02_Y10, ...
+    cout << "Strategie 1:"<< endl;
+
+    TCPclient c;
+	string host = "localhost";
+	string msg = "START";
 
 	//connect to host
 	c.conn(host , 2022); // 2022 Server Port    // Verbindung aufbauen
@@ -35,29 +47,54 @@ int main() {
     bool gameOver = false;
     int x = 1, y = 1, ctr = 0;
 
-
     while (!gameOver){
+
+        //Implementierung der Kommunikation
         ctr++;
         sleep(0.25);
-        msg = (x < 10) ? "GUESS_X0"+to_string(x) : "GUESS_X"+to_string(x);     //Anpassung der einstelligen Zahlen auf zwei Stellen
-        msg = (y < 10) ? msg + "_Y0"+to_string(y) : msg +"_Y"+to_string(y);
+        msg = guessMsg(x, y);   // Koordinaten in String konvertieren, der von Server ausgewertet werden kann
         cout << "client sends: " << msg << endl;
         c.sendData(msg);
         msg = c.receive(32);
         cout << "got response: " << msg << endl;
         if (strncmp(msg.c_str(), "GAME_OVER", 9) == 0){
-            cout << "Number of Tries: " << ctr << "." << endl;
+            cout << "Number of Tries: " << ctr << "." << endl;  //Ausgabe der benötigten Versuche zur Lösung
             gameOver = true;
-            return 0;
+            return;
         }
+        //Implementierung der eigentlichen Strategie
         x++;
-        if (x > size_x){
+        if (x > size_x){        //Kontrolle, ob x-Koordinate in Präprozessoranweisung festgelegter Spielfeldgröße liegt
             x = 1;
             y++;
         }
-        if (y>10){
-        //cout << "nicht erfolgreich" << endl;
-        return 0;
+        if (y>size_y){
+            return;
         }
     }
+}
+
+void strat_2(){
+    cout << "Strategie 2:"<< endl;
+    return;
+}
+
+void strat_3(){
+    cout << "Strategie 3:"<< endl;
+    return;
+}
+
+int main() {
+	//srand(time(NULL));
+
+    //Aufruf der in Präprozessoranweisung festgelegten Strategie
+	if (currentStrat == 1){
+        strat_1();
+	}
+	else if (currentStrat == 2){
+        strat_2();
+	}
+	else if (currentStrat == 3){
+        strat_3();
+	}
 }

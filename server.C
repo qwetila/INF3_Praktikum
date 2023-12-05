@@ -77,11 +77,11 @@ protected:
                 //Antworten überprüfen
 
                 if (rsp == TASK3::ShootResult::WATER){
-                    cout << "rsp=" << rsp << endl;
+                    //cout << "rsp=" << rsp << endl;
                     return "WATER";
                 }
                 else if (rsp == TASK3::ShootResult::SHIP_HIT){
-                    cout << "rsp=" << rsp << endl;
+                    //cout << "rsp=" << rsp << endl;
                     return "SHIP_HIT";
                 }
                 else if (rsp == TASK3::ShootResult::SHIP_DESTROYED){
