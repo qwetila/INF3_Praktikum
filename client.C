@@ -16,10 +16,14 @@
 #define size_y 10
 
 //*********************
-#define currentStrat 1  //Auswahl der aktuellen Lösungsstrategie
+#define currentStrat 2  //Auswahl der aktuellen Lösungsstrategie
 //*********************
 
 using namespace std;
+bool ship_find = false;
+bool is_destroyed = true;
+int x_start = 0;
+int y_start = 0;
 
 string guessMsg(int x, int y){      //Konvertiert Koordinaten in String für Server: GUESS_X01_Y01
 
@@ -75,8 +79,89 @@ void strat_1(){      //chronologisches Abarbeiten der Koordinaten: X01_Y01 bis X
 }
 
 void strat_2(){
+
     cout << "Strategie 2:"<< endl;
-    return;
+
+        TCPclient c;
+	string host = "localhost";
+	string msg = "START";
+
+	//connect to host
+	c.conn(host , 2022); // 2022 Server Port    // Verbindung aufbauen
+
+    cout << "client sends: " << msg << endl;
+    c.sendData(msg);
+    msg = c.receive(32);
+    cout << "got response: " << msg << endl;
+
+    bool gameOver = false;
+    int x = 1, y = 1, ctr = 0;
+
+        while (!gameOver){
+
+        //Implementierung der Kommunikation
+        ctr++;
+        sleep(2);
+        msg = guessMsg(x, y);   // Koordinaten in String konvertieren, der von Server ausgewertet werden kann
+        cout << "client sends: " << msg << endl;
+        c.sendData(msg);
+        msg = c.receive(32);
+        cout << "got response: " << msg << endl;
+        if (strncmp(msg.c_str(), "GAME_OVER", 9) == 0){
+            cout << "Number of Tries: " << ctr << "." << endl;  //Ausgabe der benötigten Versuche zur Lösung
+            gameOver = true;
+            return;
+        }
+        //Implementierung der eigentlichen Strategie
+
+
+        if (strncmp(msg.c_str(), "SHIP_HIT", 8) == 0){
+            ship_find = true;
+            cout << "ship_find_true" << endl;
+            if (is_destroyed == true) {
+                x_start = x;
+                y_start = y;
+                is_destroyed = false;
+                cout << "is_desreoyed_false" << endl;
+            }
+        }
+
+
+
+        if (ship_find == true){
+            x++;
+            if ((x > size_x) or (x > (x_start + 1))){
+                x = x_start;
+                y++;
+
+            }
+
+
+            if (strncmp(msg.c_str(), "SHIP_DESTROYED", 14) == 0){
+                ship_find = false;
+                x = x_start;
+                y = y_start;
+                is_destroyed = true;
+                cout << "is_desreoyed" << endl;
+            }
+        }
+
+
+
+        else if (ship_find == false){
+            x++;
+            cout << "else_++" << endl;
+
+            if (x > size_x){        //Kontrolle, ob x-Koordinate in Präprozessoranweisung festgelegter Spielfeldgröße liegt
+                x = 1;
+                y++;
+            }
+            if (y>size_y){
+                return;
+            }
+        }
+
+    }
 }
 
 void strat_3(){
