@@ -20,10 +20,6 @@
 //*********************
 
 using namespace std;
-bool ship_find = false;
-bool is_destroyed = true;
-int x_start = 0;
-int y_start = 0;
 
 string guessMsg(int x, int y){      //Konvertiert Koordinaten in String für Server: GUESS_X01_Y01
 
@@ -82,7 +78,7 @@ void strat_2(){
 
     cout << "Strategie 2:"<< endl;
 
-        TCPclient c;
+    TCPclient c;
 	string host = "localhost";
 	string msg = "START";
 
@@ -96,12 +92,21 @@ void strat_2(){
 
     bool gameOver = false;
     int x = 1, y = 1, ctr = 0;
+    bool ship_find = false;
+    bool is_destroyed = true;
+    bool second_shot = false;
+    bool x_direction = true;
+    int x_start = 0;
+    int y_start = 0;
+    int hits = 0;
+    int last_shot_hits = 0;
+
 
         while (!gameOver){
 
         //Implementierung der Kommunikation
         ctr++;
-        sleep(2);
+        sleep(0.5);
         msg = guessMsg(x, y);   // Koordinaten in String konvertieren, der von Server ausgewertet werden kann
         cout << "client sends: " << msg << endl;
         c.sendData(msg);
@@ -117,6 +122,7 @@ void strat_2(){
 
         if (strncmp(msg.c_str(), "SHIP_HIT", 8) == 0){
             ship_find = true;
+            hits ++;
             cout << "ship_find_true" << endl;
             if (is_destroyed == true) {
                 x_start = x;
@@ -129,19 +135,34 @@ void strat_2(){
 
 
         if (ship_find == true){
-            x++;
-            if ((x > size_x) or (x > (x_start + 1))){
-                x = x_start;
-                y++;
 
-            }
+
+            cout << hits << endl;
+            cout << last_shot_hits << endl;
+
+            //if ((x == size_x) or (hits == last_shot_hits)){x_direction = false; x--;}
+            if (hits == last_shot_hits){x_direction = false; x--;}
+
+            if (x_direction == true){x++; last_shot_hits = hits;}
+            if (x_direction == false){y++; last_shot_hits = hits;}
+
+
+
+
 
 
             if (strncmp(msg.c_str(), "SHIP_DESTROYED", 14) == 0){
                 ship_find = false;
-                x = x_start;
+                x = x_start + 2;
                 y = y_start;
+                if (x > size_x){        //Kontrolle, ob x-Koordinate in Präprozessoranweisung festgelegter Spielfeldgröße liegt
+                    x = 1;
+                    y++;
+                }
                 is_destroyed = true;
+                hits = 0;
+                last_shot_hits = 0;
+                x_direction = true;
                 cout << "is_desreoyed" << endl;
             }
         }
@@ -150,7 +171,8 @@ void strat_2(){
 
         else if (ship_find == false){
             x++;
-            cout << "else_++" << endl;
+
+            if (strncmp(msg.c_str(), "SHIP_DESTROYED", 14) == 0){x++;}
 
             if (x > size_x){        //Kontrolle, ob x-Koordinate in Präprozessoranweisung festgelegter Spielfeldgröße liegt
                 x = 1;
