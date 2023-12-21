@@ -33,8 +33,6 @@ public:
 protected:
     string myResponse(string input){
 
-
-
         if (!init){
         TASK3::World myWorld(10,10,1,2,3,4);
         init = true;
@@ -49,39 +47,25 @@ protected:
             else if (strncmp(input.c_str(), "GUESS", 5) == 0){		//Format: 	GUESS_X01_Y01 für Koordinaten x=1 & y=1
                 string strInput = input.c_str();
                 char& x1 = strInput.at(7), x2 = strInput.at(8), y1 = strInput.at(11), y2 = strInput.at(12);
-                //cout << x1 << endl;
-                //cout << x2 << endl;
 
                 string sX = ""; sX = sX + x1 + x2;
                 string sY = ""; sY = sY + y1 + y2;//
 
-
-                //cout << "sx=" << sX << endl;
-                //cout << "sy=" << sY << endl;
-
                 int xCoord = stoi(sX);
                 int yCoord = stoi(sY);
 
-                //cout << "x=" << xCoord << endl;
-                //cout << "y=" << yCoord << endl;
-
-                //sleep(0.25);
                 myWorld.printBoard();
 
                 TASK3::ShootResult eRsp = myWorld.shoot(xCoord, yCoord);
-                //cout << "eRSP=" <<  eRsp << endl;
-                int rsp = int(eRsp);
-                //cout << "rsp=" << rsp << endl;
 
+                int rsp = int(eRsp);
 
                 //Antworten überprüfen
 
                 if (rsp == TASK3::ShootResult::WATER){
-                    //cout << "rsp=" << rsp << endl;
                     return "WATER";
                 }
                 else if (rsp == TASK3::ShootResult::SHIP_HIT){
-                    //cout << "rsp=" << rsp << endl;
                     return "SHIP_HIT";
                 }
                 else if (rsp == TASK3::ShootResult::SHIP_DESTROYED){
@@ -91,7 +75,6 @@ protected:
                     return "ALL_SHIPS_DESTROYED";
                 }
                 else if (rsp == TASK3::ShootResult::GAME_OVER){
-                    cout << "rsp=" << rsp << endl;
                     return "GAME_OVER";
                 }
                 else return "ERROR";

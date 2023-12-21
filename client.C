@@ -39,36 +39,37 @@ void strat_1(){      //chronologisches Abarbeiten der Koordinaten: X01_Y01 bis X
 	//connect to host
 	c.conn(host , 2022); // 2022 Server Port    // Verbindung aufbauen
 
-    cout << "client sends: " << msg << endl;
     c.sendData(msg);
     msg = c.receive(32);
-    cout << "got response: " << msg << endl;
 
     bool gameOver = false;
     int x = 1, y = 1, ctr = 0;
 
     while (!gameOver){
 
-        //Implementierung der Kommunikation
         ctr++;
         sleep(0.25);
         msg = guessMsg(x, y);   // Koordinaten in String konvertieren, der von Server ausgewertet werden kann
-        cout << "client sends: " << msg << endl;
         c.sendData(msg);
         msg = c.receive(32);
-        cout << "got response: " << msg << endl;
         if (strncmp(msg.c_str(), "GAME_OVER", 9) == 0){
             cout << "Number of Tries: " << ctr << "." << endl;  //Ausgabe der benötigten Versuche zur Lösung
             gameOver = true;
+            msg = "BYEBYE";
+            c.sendData(msg);
+            msg = c.receive(32);
             return;
         }
-        //Implementierung der eigentlichen Strategie
+
         x++;
         if (x > size_x){        //Kontrolle, ob x-Koordinate in Präprozessoranweisung festgelegter Spielfeldgröße liegt
             x = 1;
             y++;
         }
         if (y>size_y){
+            msg = "BYEBYE";
+            c.sendData(msg);
+            msg = c.receive(32);
             return;
         }
     }
@@ -196,10 +197,8 @@ void strat_3(){     //bei Treffer Schiff systematisch abarbeiten, an Schiffe ang
 	//connect to host
 	c.conn(host , 2022); // 2022 Server Port    // Verbindung aufbauen  //über #define?
 
-    cout << "client sends: " << msg << endl;
     c.sendData(msg);
     msg = c.receive(32);
-    cout << "got response: " << msg << endl;
 
     int x = 1, y = 1, ctr = 0;      //Startkoordinaten für ersten Schuss
     int board[size_x+2][size_y+2] = {}; //Array mit 0 initialisieren, speichern der bereits bekannten Felder
@@ -208,47 +207,46 @@ void strat_3(){     //bei Treffer Schiff systematisch abarbeiten, an Schiffe ang
 
         if (board[x][y] == 0){
 
-            //Implementierung der Kommunikation
             ctr++;
-            sleep(0.25);
 
             msg = guessMsg(x, y);   // Koordinaten in String konvertieren, der von Server ausgewertet werden kann
-            cout << "client sends: " << msg << endl;
             c.sendData(msg);
             msg = c.receive(32);
-            cout << "got response: " << msg << endl;
 
             if (strncmp(msg.c_str(), "GAME_OVER", 9) == 0){
                 cout << "Number of Tries: " << ctr << "." << endl;  //Ausgabe der benötigten Versuche zur Lösung
+                msg = "BYEBYE";
+                c.sendData(msg);
+                msg = c.receive(32);
                 return;
             }   //end if
 
             if (strncmp(msg.c_str(), "SHIP_HIT", 8) == 0){
-                cout << "initialer Treffer: " << msg << endl;
                 int x_bfr = x, y_bfr = y;
 
-                while (strncmp(msg.c_str(), "WATER", 5) != 0){      //Schiff in Richtung X+ weiterverfolgen
+                while (strncmp(msg.c_str(), "WATER", 5) != 0){  //Schiff in Richtung X+ weiterverfolgen
                     x_bfr++;
-                    if (x_bfr > size_x){break;}
-                    if (board[x_bfr][y_bfr] == 1){break;}
+                    if (x_bfr > size_x){break;}                 //Richtung x+ nicht weiter verfolgen, wenn out of bounds
+                    if (board[x_bfr][y_bfr] == 1){break;}       //nicht weiter verfolgen, wenn bereits abgedeckt
                     ctr++;
-                    msg = guessMsg(x_bfr, y_bfr);   // Koordinaten in String konvertieren, der von Server ausgewertet werden kann
-                    cout << "client sends: " << msg << endl;
+                    msg = guessMsg(x_bfr, y_bfr);               // Koordinaten in String konvertieren, der von Server ausgewertet werden kann
                     c.sendData(msg);
                     msg = c.receive(32);
-                    cout << "got response: " << msg << endl;
 
                     if (strncmp(msg.c_str(), "SHIP_DESTROYED", 14) == 0){
-                        for (int i = x-1; i<=x_bfr+1; i++){
+                        for (int i = x-1; i<=x_bfr+1; i++){     //merken der umliegenden Felder nach Zerstörung des Schiffs
                             for (int j = y-1; j<=y_bfr+1; j++){
                                 board[i][j] = 1;
-                            }
-                        }
+                            }   //end for
+                        }   //end for
                         break;
                     }   //end if (SHIP_DESTROYED)
 
                     if (strncmp(msg.c_str(), "GAME_OVER", 9) == 0){
                         cout << "Number of Tries: " << ctr << "." << endl;  //Ausgabe der benötigten Versuche zur Lösung
+                        msg = "BYEBYE";
+                        c.sendData(msg);
+                        msg = c.receive(32);
                         return;
                     }   //end if (GAME_OVER)
                 }   //end while (!WATER)
@@ -261,22 +259,23 @@ void strat_3(){     //bei Treffer Schiff systematisch abarbeiten, an Schiffe ang
                         if (y_bfr > size_y){break;}
                         if (board[x_bfr][y_bfr] == 1){break;}       //verhindert Schuss ins Wasser, bricht die Schleife anstelle der eigentlichen Abbruchbedingung ab
                         ctr++;
-                        msg = guessMsg(x_bfr, y_bfr);   // Koordinaten in String konvertieren, der von Server ausgewertet werden kann
-                        cout << "client sends: " << msg << endl;
+                        msg = guessMsg(x_bfr, y_bfr);       // Koordinaten in String konvertieren, der von Server ausgewertet werden kann
                         c.sendData(msg);
                         msg = c.receive(32);
-                        cout << "got response: " << msg << endl;
 
                         if (strncmp(msg.c_str(), "SHIP_DESTROYED", 14) == 0){
-                            for (int i = x-1; i<=x_bfr+1; i++){
+                            for (int i = x-1; i<=x_bfr+1; i++){     //merken der umliegenden Felder nach Zerstörung des Schiffs
                                 for (int j = y-1; j<=y_bfr+1; j++){
                                     board[i][j] = 1;
-                                }
-                            }
+                                }   //end for
+                            }   //end for
                             break;
                         }   //end if (SHIP_DESTROYED)
                         if (strncmp(msg.c_str(), "GAME_OVER", 9) == 0){
                             cout << "Number of Tries: " << ctr << "." << endl;  //Ausgabe der benötigten Versuche zur Lösung
+                            msg = "BYEBYE";
+                            c.sendData(msg);
+                            msg = c.receive(32);
                             return;
                         }   //end if (GAME_OVER)
                     }   //end while (!WATER)
@@ -290,6 +289,11 @@ void strat_3(){     //bei Treffer Schiff systematisch abarbeiten, an Schiffe ang
             y++;
         }   //end if
         if (y>size_y){
+            msg = "BYEBYE";
+            cout << "client sends: " << msg << endl;
+            c.sendData(msg);
+            msg = c.receive(32);
+            cout << "got response: " << msg << endl;
             return;
         }   //end if
     }   //end while (true)
