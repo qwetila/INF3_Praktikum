@@ -86,10 +86,10 @@ void strat_2(TCPclient* c){
 	//connect to host
 	//c->conn(host , 2022); // 2022 Server Port    // Verbindung aufbauen
 
-    cout << "client sends: " << msg << endl;
+    //cout << "client sends: " << msg << endl;
     c->sendData(msg);
     msg = c->receive(32);
-    cout << "got response: " << msg << endl;
+    //cout << "got response: " << msg << endl;
 
     bool gameOver = false;
     int x = 1, y = 1, ctr = 0;
@@ -109,10 +109,10 @@ void strat_2(TCPclient* c){
         ctr++;
         sleep(0.5);
         msg = guessMsg(x, y);   // Koordinaten in String konvertieren, der von Server ausgewertet werden kann
-        cout << "client sends: " << msg << endl;
+        //cout << "client sends: " << msg << endl;
         c->sendData(msg);
         msg = c->receive(32);
-        cout << "got response: " << msg << endl;
+        //cout << "got response: " << msg << endl;
         if (strncmp(msg.c_str(), "GAME_OVER", 9) == 0){
             cout << "Number of Tries: " << ctr << "." << endl;  //Ausgabe der benötigten Versuche zur Lösung
             gameOver = true;
@@ -124,12 +124,12 @@ void strat_2(TCPclient* c){
         if (strncmp(msg.c_str(), "SHIP_HIT", 8) == 0){
             ship_find = true;
             hits ++;
-            cout << "ship_find_true" << endl;
+            //cout << "ship_find_true" << endl;
             if (is_destroyed == true) {
                 x_start = x;
                 y_start = y;
                 is_destroyed = false;
-                cout << "is_desreoyed_false" << endl;
+                //cout << "is_desreoyed_false" << endl;
             }
         }
 
@@ -138,8 +138,8 @@ void strat_2(TCPclient* c){
         if (ship_find == true){
 
 
-            cout << hits << endl;
-            cout << last_shot_hits << endl;
+            //cout << hits << endl;
+            //cout << last_shot_hits << endl;
 
             //if ((x == size_x) or (hits == last_shot_hits)){x_direction = false; x--;}
             if (hits == last_shot_hits){x_direction = false; x--;}
@@ -164,7 +164,7 @@ void strat_2(TCPclient* c){
                 hits = 0;
                 last_shot_hits = 0;
                 x_direction = true;
-                cout << "is_desreoyed" << endl;
+                //cout << "is_desreoyed" << endl;
             }
         }
 
@@ -305,8 +305,6 @@ void strat_3(TCPclient* c){     //bei Treffer Schiff systematisch abarbeiten, an
     }   //end while (true)
 }   //end strat_3
 
-//>Methode mit Schießen auf zufällige Koordinaten
-
 int main() {
 	srand(time(NULL));
 
@@ -314,42 +312,44 @@ int main() {
 	string host = "localhost";
 	client.conn(host , 2022); // 2022 Server Port    // Verbindung aufbauen
 
-    int currentStrat = 0;
-    string msg;
-    char userCmd;
+    while (1){
+        int currentStrat = 0;
+        string msg;
+        char userCmd;
 
-    cout << "Strategie auswählen (1, 2 oder 3; q zum Beenden): " << endl;
-	cin >> userCmd;
-	//cout << "Input: " << userCmd << endl;
-	if (isdigit(userCmd)){
-        currentStrat = userCmd - '0';
-        if (currentStrat < 1 || currentStrat > 3){
-            currentStrat = 0;
+        cout << "Strategie auswählen (1, 2 oder 3; q zum Beenden): " << endl;
+        cin >> userCmd;
+        //cout << "Input: " << userCmd << endl;
+        if (isdigit(userCmd)){
+            currentStrat = userCmd - '0';
+            if (currentStrat < 1 || currentStrat > 3){
+                currentStrat = 0;
+                cout << "Fehlerhafte Eingabe." << endl;
+            }
+            if (currentStrat != 0){
+                cout << "Selected Strategy: " << currentStrat << endl;
+            }
+        }
+        else if(userCmd == 'q'){
+            cout << "Programm wird beendet." << endl;
+            msg = "BYEBYE";
+            client.sendData(msg);
+            msg = client.receive(32);
+            return 0;
+        }
+        else{
             cout << "Fehlerhafte Eingabe." << endl;
         }
-        if (currentStrat != 0){
-            cout << "Selected Strategy: " << currentStrat << endl;
-        }
-	}
-	else if(userCmd == 'q'){
-        cout << "Programm wird beendet." << endl;
-        msg = "BYEBYE";
-        client.sendData(msg);
-        msg = client.receive(32);
-        return 0;
-	}
-	else{
-        cout << "Fehlerhafte Eingabe." << endl;
-	}
 
-    //Aufruf der in Präprozessoranweisung festgelegten Strategie
-	if (currentStrat == 1){
-        strat_1(&client);
-	}
-	else if (currentStrat == 2){
-        strat_2(&client);
-	}
-	else if (currentStrat == 3){
-        strat_3(&client);
+        //Aufruf der in Präprozessoranweisung festgelegten Strategie
+        if (currentStrat == 1){
+            strat_1(&client);
+        }
+        else if (currentStrat == 2){
+            strat_2(&client);
+        }
+        else if (currentStrat == 3){
+            strat_3(&client);
+        }
 	}
 }

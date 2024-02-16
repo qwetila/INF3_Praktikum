@@ -219,8 +219,9 @@ private:
 	 *
 	 */
 	virtual bool placeShips();
-
-
+    //****************************************************************
+    void resetAllCoordinates();
+    //****************************************************************
 	BlockState coordAlreadyUsed(int x, int y);
 	bool checkNeighborhood(int x, int y);
 	void removeAllBlockCoordFromShip(Ship *s);

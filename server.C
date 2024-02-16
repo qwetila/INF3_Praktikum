@@ -34,14 +34,14 @@ protected:
     string myResponse(string input){
 
         if (!init){
-        TASK3::World myWorld(10,10,1,2,3,4);
+        //TASK3::World myWorld(10,10,1,2,3,4);
         init = true;
         }
         while (init){
 
             if (strncmp(input.c_str(), "START", 5) == 0){       //Ersten 5 Stellen des Statements auf Gleichheit überprüfen
-                //myWorld(10,10,1,2,3,4);
-                myWorld.printBoard();
+                TASK3::World* myWorld = new TASK3::World(10,10,1,2,3,4);
+                myWorld->printBoard();
                 return "READY";
             }
             else if (strncmp(input.c_str(), "GUESS", 5) == 0){		//Format: 	GUESS_X01_Y01 für Koordinaten x=1 & y=1
@@ -75,6 +75,9 @@ protected:
                     return "ALL_SHIPS_DESTROYED";
                 }
                 else if (rsp == TASK3::ShootResult::GAME_OVER){
+                    //************************
+                    //delete &myWorld;
+                    //************************
                     return "GAME_OVER";
                 }
                 else return "ERROR";
