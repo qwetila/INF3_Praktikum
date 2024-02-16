@@ -67,8 +67,6 @@ protected:
     };
 };
 
-
-
 int main(){
 	srand(time(nullptr));
 	myServer srv(2022,25);
