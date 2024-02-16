@@ -1,10 +1,3 @@
-/*
- * client.C
- *
- *  Created on: 11.09.2019
- *      Author: aml
- */
-
 #include <string>
 #include <cstring> 	//contains string functions
 #include <iostream>
@@ -15,13 +8,9 @@
 #define size_x 10       //Festlegen der Spielfeldgröße
 #define size_y 10
 
-//*********************
-//#define currentStrat 3  //Auswahl der aktuellen Lösungsstrategie
-//*********************
-
 using namespace std;
 
-string guessMsg(int x, int y){      //Konvertiert Koordinaten in String für Server: GUESS_X01_Y01
+string guessMsg(int x, int y){  //Konvertiert Koordinaten in String für Server: GUESS_X01_Y01
 
     string msg = "";
     msg = (x < 10) ? "GUESS_X0"+to_string(x) : "GUESS_X"+to_string(x);     //Anpassung der einstelligen Zahlen auf zwei Stellen
@@ -29,7 +18,7 @@ string guessMsg(int x, int y){      //Konvertiert Koordinaten in String für Ser
     return msg;
 }
 
-void strat_1(TCPclient* c){      //chronologisches Abarbeiten der Koordinaten: X01_Y01 bis X01_Y10, X02_Y01 bis X02_Y10, ...
+void strat_1(TCPclient* c){     //chronologisches Abarbeiten der Koordinaten: X01_Y01 bis X01_Y10, X02_Y01 bis X02_Y10, ...
     cout << "Strategie 1:"<< endl;
 
     //TCPclient c;
@@ -55,9 +44,9 @@ void strat_1(TCPclient* c){      //chronologisches Abarbeiten der Koordinaten: X
         if (strncmp(msg.c_str(), "GAME_OVER", 9) == 0){
             cout << "Number of Tries: " << ctr << "." << endl;  //Ausgabe der benötigten Versuche zur Lösung
             gameOver = true;
-            msg = "BYEBYE";
-            c->sendData(msg);
-            msg = c->receive(32);
+            //msg = "BYEBYE";
+            //c->sendData(msg);
+            //msg = c->receive(32);
             return;
         }
 
@@ -67,15 +56,15 @@ void strat_1(TCPclient* c){      //chronologisches Abarbeiten der Koordinaten: X
             y++;
         }
         if (y>size_y){
-            msg = "BYEBYE";
-            c->sendData(msg);
-            msg = c->receive(32);
+            //msg = "BYEBYE";
+            //c->sendData(msg);
+            //msg = c->receive(32);
             return;
         }
     }
 }
 
-void strat_2(TCPclient* c){
+void strat_2(TCPclient* c){     //bei initialem Treffer Schiffe systematisch abarbeiten, jedoch kein Gedächtnis über bereits anvisierte Felder
 
     cout << "Strategie 2:"<< endl;
 
@@ -305,13 +294,13 @@ void strat_3(TCPclient* c){     //bei Treffer Schiff systematisch abarbeiten, an
     }   //end while (true)
 }   //end strat_3
 
-int main() {
-	srand(time(NULL));
+int main(){
+	srand(time(nullptr));
 
     TCPclient client;
 	string host = "localhost";
-	client.conn(host , 2022); // 2022 Server Port    // Verbindung aufbauen
-
+	bool success = client.conn(host , 2022);   // Verbindung aufbauen
+    if (!success){return 0;}    //Beenden, wenn verbindung nicht aufgebaut werden konnte
     while (1){
         int currentStrat = 0;
         string msg;
@@ -319,10 +308,10 @@ int main() {
 
         cout << "Strategie auswählen (1, 2 oder 3; q zum Beenden): " << endl;
         cin >> userCmd;
-        //cout << "Input: " << userCmd << endl;
-        if (isdigit(userCmd)){
+
+        if (isdigit(userCmd)){          //Überprüfen, ob Eingabe eine Zahl ist
             currentStrat = userCmd - '0';
-            if (currentStrat < 1 || currentStrat > 3){
+            if (currentStrat < 1 || currentStrat > 3){      //Überprüfen, ob Zahl gültiger Strategie entspricht
                 currentStrat = 0;
                 cout << "Fehlerhafte Eingabe." << endl;
             }
@@ -330,7 +319,7 @@ int main() {
                 cout << "Selected Strategy: " << currentStrat << endl;
             }
         }
-        else if(userCmd == 'q'){
+        else if(userCmd == 'q'){            //Auf Befehl zum Beenden des Clients und Schließen der Serververbindung überprüfen
             cout << "Programm wird beendet." << endl;
             msg = "BYEBYE";
             client.sendData(msg);
@@ -341,7 +330,7 @@ int main() {
             cout << "Fehlerhafte Eingabe." << endl;
         }
 
-        //Aufruf der in Präprozessoranweisung festgelegten Strategie
+        //Aufruf der in ausgwählten Strategie mit Übergabe des Clients
         if (currentStrat == 1){
             strat_1(&client);
         }

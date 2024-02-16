@@ -92,35 +92,6 @@ Ship *World::defaultShipFactory(int nmbBlocks){
 	}
 	return ship;
 }
-//****************************************************************
-void World::resetAllCoordinates(){
-    int sIdx = 0;
-    while(sIdx < nmbShips_){
-        removeAllBlockCoordFromShip(ships_[sIdx]);
-        sIdx++;
-    }
-    /*
-    int nmbBlocks;
-	Block *block;
-
-    for (int x=1; x<=10; x++){
-        for (int y=1; y<=10; y++){
-	// check coordinate
-            for(int sIdx=0; sIdx<nmbShips_;sIdx++){ // go through the ships
-                nmbBlocks = ships_[sIdx]->nmbBlocks_;
-                for(int bIdx=0; bIdx < nmbBlocks; bIdx++){
-                    block = ((ships_[sIdx])->blocks_)[bIdx];
-                    // check coordinate
-                    if((block->x_ == x) && (block->y_ == y)){
-                        block->state_ = BLOCK_CLEAR;
-                    }
-                }
-            }
-        }
-    }
-    */
-}
-//****************************************************************
 
 BlockState World::coordAlreadyUsed(int x, int y){
 	int nmbBlocks;
@@ -311,8 +282,8 @@ bool World::placeSingleShip(int idxShip){       //automatisches Platzieren eines
 
 ShootResult World::shoot(int x, int y){
 	if(allShipsDestroyed()){
-		cout << "Alle Schiffe werden als zerstört angenommen..." << endl;
-		resetAllCoordinates();
+		//cout << "Alle Schiffe werden als zerstört angenommen..." << endl;
+		//resetAllCoordinates();
 		return GAME_OVER;
 	}
 
@@ -334,12 +305,6 @@ ShootResult World::shoot(int x, int y){
 					s->state_ = DESTROYED;
 
 					if(allShipsDestroyed()){
-						//********************************************************************
-						for(int idxShp = 0; idxShp < nmbShips_; idxShp++){
-                            ships_[idxShp]->state_ = ALIVE;    //Rücksetzen von state_ des Schiffs für nächste Runde
-                        }
-                        resetAllCoordinates();
-                        //********************************************************************
 						return GAME_OVER;
 					}else{
 						return SHIP_DESTROYED;

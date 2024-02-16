@@ -1,9 +1,3 @@
-/*
- * server.C
- *
- *  Created on: 11.09.2019
- *      Author: aml
- */
 #include <cstdio> 	//standard input and output library
 #include <cstdlib> 	//this includes functions regarding memory allocation
 #include <cstring> 	//contains string functions
@@ -20,8 +14,7 @@
 #include "SIMPLESOCKET.H"
 #include "TASK3.H"
 
-bool init = false;
-TASK3::World myWorld;
+TASK3::World* myWorld;
 
 class myServer : public TCPserver{
 public:
@@ -29,61 +22,47 @@ public:
 		;
 	};
 
-
 protected:
     string myResponse(string input){
 
-        if (!init){
-        //TASK3::World myWorld(10,10,1,2,3,4);
-        init = true;
+        if (strncmp(input.c_str(), "START", 5) == 0){       //Ersten 5 Stellen des Statements auf Gleichheit überprüfen
+            myWorld = new TASK3::World(10,10,1,2,3,4);      //Neues Spielfeld erstellen
+            myWorld->printBoard();                          //Spielfeld graphisch darstellen
+            return "READY";
         }
-        while (init){
+        else if (strncmp(input.c_str(), "GUESS", 5) == 0){		//Format: 	GUESS_X01_Y01 für Koordinaten x=1 & y=1
+            string strInput = input.c_str();
+            char& x1 = strInput.at(7), x2 = strInput.at(8), y1 = strInput.at(11), y2 = strInput.at(12);
 
-            if (strncmp(input.c_str(), "START", 5) == 0){       //Ersten 5 Stellen des Statements auf Gleichheit überprüfen
-                TASK3::World* myWorld = new TASK3::World(10,10,1,2,3,4);
-                myWorld->printBoard();
-                return "READY";
+            string sX = ""; sX = sX + x1 + x2;
+            string sY = ""; sY = sY + y1 + y2;//
+
+            int xCoord = stoi(sX);
+            int yCoord = stoi(sY);
+
+            myWorld->printBoard();      //Spielfeld graphisch darstellen
+
+            TASK3::ShootResult eRsp = myWorld->shoot(xCoord, yCoord);
+
+            int rsp = int(eRsp);
+
+            //Antworten überprüfen
+
+            if (rsp == TASK3::ShootResult::WATER){
+                return "WATER";
             }
-            else if (strncmp(input.c_str(), "GUESS", 5) == 0){		//Format: 	GUESS_X01_Y01 für Koordinaten x=1 & y=1
-                string strInput = input.c_str();
-                char& x1 = strInput.at(7), x2 = strInput.at(8), y1 = strInput.at(11), y2 = strInput.at(12);
-
-                string sX = ""; sX = sX + x1 + x2;
-                string sY = ""; sY = sY + y1 + y2;//
-
-                int xCoord = stoi(sX);
-                int yCoord = stoi(sY);
-
-                myWorld.printBoard();
-
-                TASK3::ShootResult eRsp = myWorld.shoot(xCoord, yCoord);
-
-                int rsp = int(eRsp);
-
-                //Antworten überprüfen
-
-                if (rsp == TASK3::ShootResult::WATER){
-                    return "WATER";
-                }
-                else if (rsp == TASK3::ShootResult::SHIP_HIT){
-                    return "SHIP_HIT";
-                }
-                else if (rsp == TASK3::ShootResult::SHIP_DESTROYED){
-                    return "SHIP_DESTROYED";
-                }
-                else if (rsp == TASK3::ShootResult::ALL_SHIPS_DESTROYED){
-                    return "ALL_SHIPS_DESTROYED";
-                }
-                else if (rsp == TASK3::ShootResult::GAME_OVER){
-                    //************************
-                    //delete &myWorld;
-                    //************************
-                    return "GAME_OVER";
-                }
-                else return "ERROR";
-
+            else if (rsp == TASK3::ShootResult::SHIP_HIT){
+                return "SHIP_HIT";
             }
-            else return 0; //"Fehlerhafte Eingabe";
+            else if (rsp == TASK3::ShootResult::SHIP_DESTROYED){
+                return "SHIP_DESTROYED";
+            }
+            else if (rsp == TASK3::ShootResult::ALL_SHIPS_DESTROYED){
+                return "ALL_SHIPS_DESTROYED";
+            }
+            else if (rsp == TASK3::ShootResult::GAME_OVER){
+                return "GAME_OVER";
+            }
         }
     };
 };
