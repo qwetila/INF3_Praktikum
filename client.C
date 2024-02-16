@@ -16,7 +16,7 @@
 #define size_y 10
 
 //*********************
-#define currentStrat 3  //Auswahl der aktuellen Lösungsstrategie
+//#define currentStrat 3  //Auswahl der aktuellen Lösungsstrategie
 //*********************
 
 using namespace std;
@@ -29,18 +29,18 @@ string guessMsg(int x, int y){      //Konvertiert Koordinaten in String für Ser
     return msg;
 }
 
-void strat_1(){      //chronologisches Abarbeiten der Koordinaten: X01_Y01 bis X01_Y10, X02_Y01 bis X02_Y10, ...
+void strat_1(TCPclient* c){      //chronologisches Abarbeiten der Koordinaten: X01_Y01 bis X01_Y10, X02_Y01 bis X02_Y10, ...
     cout << "Strategie 1:"<< endl;
 
-    TCPclient c;
-	string host = "localhost";
+    //TCPclient c;
+	//string host = "localhost";
 	string msg = "START";
 
 	//connect to host
-	c.conn(host , 2022); // 2022 Server Port    // Verbindung aufbauen
+	//c->conn(host , 2022); // 2022 Server Port    // Verbindung aufbauen
 
-    c.sendData(msg);
-    msg = c.receive(32);
+    c->sendData(msg);
+    msg = c->receive(32);
 
     bool gameOver = false;
     int x = 1, y = 1, ctr = 0;
@@ -50,14 +50,14 @@ void strat_1(){      //chronologisches Abarbeiten der Koordinaten: X01_Y01 bis X
         ctr++;
         sleep(0.25);
         msg = guessMsg(x, y);   // Koordinaten in String konvertieren, der von Server ausgewertet werden kann
-        c.sendData(msg);
-        msg = c.receive(32);
+        c->sendData(msg);
+        msg = c->receive(32);
         if (strncmp(msg.c_str(), "GAME_OVER", 9) == 0){
             cout << "Number of Tries: " << ctr << "." << endl;  //Ausgabe der benötigten Versuche zur Lösung
             gameOver = true;
             msg = "BYEBYE";
-            c.sendData(msg);
-            msg = c.receive(32);
+            c->sendData(msg);
+            msg = c->receive(32);
             return;
         }
 
@@ -68,27 +68,27 @@ void strat_1(){      //chronologisches Abarbeiten der Koordinaten: X01_Y01 bis X
         }
         if (y>size_y){
             msg = "BYEBYE";
-            c.sendData(msg);
-            msg = c.receive(32);
+            c->sendData(msg);
+            msg = c->receive(32);
             return;
         }
     }
 }
 
-void strat_2(){
+void strat_2(TCPclient* c){
 
     cout << "Strategie 2:"<< endl;
 
-    TCPclient c;
-	string host = "localhost";
+    //TCPclient c;
+	//string host = "localhost";
 	string msg = "START";
 
 	//connect to host
-	c.conn(host , 2022); // 2022 Server Port    // Verbindung aufbauen
+	//c->conn(host , 2022); // 2022 Server Port    // Verbindung aufbauen
 
     cout << "client sends: " << msg << endl;
-    c.sendData(msg);
-    msg = c.receive(32);
+    c->sendData(msg);
+    msg = c->receive(32);
     cout << "got response: " << msg << endl;
 
     bool gameOver = false;
@@ -110,8 +110,8 @@ void strat_2(){
         sleep(0.5);
         msg = guessMsg(x, y);   // Koordinaten in String konvertieren, der von Server ausgewertet werden kann
         cout << "client sends: " << msg << endl;
-        c.sendData(msg);
-        msg = c.receive(32);
+        c->sendData(msg);
+        msg = c->receive(32);
         cout << "got response: " << msg << endl;
         if (strncmp(msg.c_str(), "GAME_OVER", 9) == 0){
             cout << "Number of Tries: " << ctr << "." << endl;  //Ausgabe der benötigten Versuche zur Lösung
@@ -187,18 +187,24 @@ void strat_2(){
     }
 }
 
-void strat_3(){     //bei Treffer Schiff systematisch abarbeiten, an Schiffe angrenzende Felder werden übersprungen
+void strat_3(TCPclient* c){     //bei Treffer Schiff systematisch abarbeiten, an Schiffe angrenzende Felder werden übersprungen
     cout << "Strategie 3:"<< endl;
 
-    TCPclient c;                //als Pointer aus Main übergeben?
-	string host = "localhost";  //auch als Parameter
+    //TCPclient c;                //als Pointer aus Main übergeben?
+	//string host = "localhost";  //auch als Parameter
+
+
 	string msg = "START";
 
-	//connect to host
-	c.conn(host , 2022); // 2022 Server Port    // Verbindung aufbauen  //über #define?
+    //string msg;
+    //string userCmd;
+    //cin >> userCmd;
 
-    c.sendData(msg);
-    msg = c.receive(32);
+	//connect to host
+	//c->conn(host , 2022); // 2022 Server Port    // Verbindung aufbauen  //über #define?
+
+    c->sendData(msg);
+    msg = c->receive(32);
 
     int x = 1, y = 1, ctr = 0;      //Startkoordinaten für ersten Schuss
     int board[size_x+2][size_y+2] = {}; //Array mit 0 initialisieren, speichern der bereits bekannten Felder
@@ -210,14 +216,14 @@ void strat_3(){     //bei Treffer Schiff systematisch abarbeiten, an Schiffe ang
             ctr++;
 
             msg = guessMsg(x, y);   // Koordinaten in String konvertieren, der von Server ausgewertet werden kann
-            c.sendData(msg);
-            msg = c.receive(32);
+            c->sendData(msg);
+            msg = c->receive(32);
 
             if (strncmp(msg.c_str(), "GAME_OVER", 9) == 0){
                 cout << "Number of Tries: " << ctr << "." << endl;  //Ausgabe der benötigten Versuche zur Lösung
-                msg = "BYEBYE";
-                c.sendData(msg);
-                msg = c.receive(32);
+                //msg = "BYEBYE";
+                //c->sendData(msg);
+                //msg = c->receive(32);
                 return;
             }   //end if
 
@@ -230,8 +236,8 @@ void strat_3(){     //bei Treffer Schiff systematisch abarbeiten, an Schiffe ang
                     if (board[x_bfr][y_bfr] == 1){break;}       //nicht weiter verfolgen, wenn bereits abgedeckt
                     ctr++;
                     msg = guessMsg(x_bfr, y_bfr);               // Koordinaten in String konvertieren, der von Server ausgewertet werden kann
-                    c.sendData(msg);
-                    msg = c.receive(32);
+                    c->sendData(msg);
+                    msg = c->receive(32);
 
                     if (strncmp(msg.c_str(), "SHIP_DESTROYED", 14) == 0){
                         for (int i = x-1; i<=x_bfr+1; i++){     //merken der umliegenden Felder nach Zerstörung des Schiffs
@@ -244,9 +250,9 @@ void strat_3(){     //bei Treffer Schiff systematisch abarbeiten, an Schiffe ang
 
                     if (strncmp(msg.c_str(), "GAME_OVER", 9) == 0){
                         cout << "Number of Tries: " << ctr << "." << endl;  //Ausgabe der benötigten Versuche zur Lösung
-                        msg = "BYEBYE";
-                        c.sendData(msg);
-                        msg = c.receive(32);
+                        //msg = "BYEBYE";
+                        //c->sendData(msg);
+                        //msg = c->receive(32);
                         return;
                     }   //end if (GAME_OVER)
                 }   //end while (!WATER)
@@ -260,8 +266,8 @@ void strat_3(){     //bei Treffer Schiff systematisch abarbeiten, an Schiffe ang
                         if (board[x_bfr][y_bfr] == 1){break;}       //verhindert Schuss ins Wasser, bricht die Schleife anstelle der eigentlichen Abbruchbedingung ab
                         ctr++;
                         msg = guessMsg(x_bfr, y_bfr);       // Koordinaten in String konvertieren, der von Server ausgewertet werden kann
-                        c.sendData(msg);
-                        msg = c.receive(32);
+                        c->sendData(msg);
+                        msg = c->receive(32);
 
                         if (strncmp(msg.c_str(), "SHIP_DESTROYED", 14) == 0){
                             for (int i = x-1; i<=x_bfr+1; i++){     //merken der umliegenden Felder nach Zerstörung des Schiffs
@@ -273,9 +279,9 @@ void strat_3(){     //bei Treffer Schiff systematisch abarbeiten, an Schiffe ang
                         }   //end if (SHIP_DESTROYED)
                         if (strncmp(msg.c_str(), "GAME_OVER", 9) == 0){
                             cout << "Number of Tries: " << ctr << "." << endl;  //Ausgabe der benötigten Versuche zur Lösung
-                            msg = "BYEBYE";
-                            c.sendData(msg);
-                            msg = c.receive(32);
+                            //msg = "BYEBYE";
+                            //c->sendData(msg);
+                            //msg = c->receive(32);
                             return;
                         }   //end if (GAME_OVER)
                     }   //end while (!WATER)
@@ -291,27 +297,59 @@ void strat_3(){     //bei Treffer Schiff systematisch abarbeiten, an Schiffe ang
         if (y>size_y){
             msg = "BYEBYE";
             cout << "client sends: " << msg << endl;
-            c.sendData(msg);
-            msg = c.receive(32);
+            c->sendData(msg);
+            msg = c->receive(32);
             cout << "got response: " << msg << endl;
             return;
         }   //end if
     }   //end while (true)
-}
+}   //end strat_3
 
 //>Methode mit Schießen auf zufällige Koordinaten
 
 int main() {
-	//srand(time(NULL));
+	srand(time(NULL));
+
+    TCPclient client;
+	string host = "localhost";
+	client.conn(host , 2022); // 2022 Server Port    // Verbindung aufbauen
+
+    int currentStrat = 0;
+    string msg;
+    char userCmd;
+
+    cout << "Strategie auswählen (1, 2 oder 3; q zum Beenden): " << endl;
+	cin >> userCmd;
+	//cout << "Input: " << userCmd << endl;
+	if (isdigit(userCmd)){
+        currentStrat = userCmd - '0';
+        if (currentStrat < 1 || currentStrat > 3){
+            currentStrat = 0;
+            cout << "Fehlerhafte Eingabe." << endl;
+        }
+        if (currentStrat != 0){
+            cout << "Selected Strategy: " << currentStrat << endl;
+        }
+	}
+	else if(userCmd == 'q'){
+        cout << "Programm wird beendet." << endl;
+        msg = "BYEBYE";
+        client.sendData(msg);
+        msg = client.receive(32);
+        return 0;
+	}
+	else{
+        cout << "Fehlerhafte Eingabe." << endl;
+	}
 
     //Aufruf der in Präprozessoranweisung festgelegten Strategie
 	if (currentStrat == 1){
-        strat_1();
+        strat_1(&client);
 	}
 	else if (currentStrat == 2){
-        strat_2();
+        strat_2(&client);
 	}
 	else if (currentStrat == 3){
-        strat_3();
+        strat_3(&client);
 	}
 }
