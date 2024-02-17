@@ -14,10 +14,9 @@
 #include "SIMPLESOCKET.H"
 #include "TASK3.H"
 
-class myServer : public TCPserver{
-private:
-    TASK3::World* myWorld;
+TASK3::World* myWorld;
 
+class myServer : public TCPserver{
 public:
     myServer(int port, int msgSize) : TCPserver(port, msgSize){
 		;
