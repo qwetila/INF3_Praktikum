@@ -1,0 +1,5 @@
+<map id="server" name="server">
+<area shape="rect" id="node2" href="$d1/d6d/classTASK3_1_1World.html" title="This class represents the game board. " alt="" coords="5,184,112,211"/>
+<area shape="rect" id="node3" href="$d2/db2/classTASK3_1_1Ship.html" title="Implements the data structure for the battle ships. " alt="" coords="9,95,108,121"/>
+<area shape="rect" id="node4" href="$d6/d9a/classTASK3_1_1Block.html" title="Implements a class that is the basic building block of the game world. " alt="" coords="6,5,111,32"/>
+</map>

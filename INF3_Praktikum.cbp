@@ -63,6 +63,7 @@
 			<Option compilerVar="CC" />
 			<Option target="all" />
 		</Unit>
+		<Unit filename="client.h" />
 		<Unit filename="main.C">
 			<Option compilerVar="CC" />
 			<Option target="all" />
@@ -71,6 +72,7 @@
 			<Option compilerVar="CC" />
 			<Option target="all" />
 		</Unit>
+		<Unit filename="server.h" />
 		<Extensions>
 			<code_completion />
 			<debugger />

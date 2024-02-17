@@ -10,6 +10,8 @@
 
 using namespace std;
 
+class client{
+public:
 string guessMsg(int x, int y){  //Konvertiert Koordinaten in String für Server: GUESS_X01_Y01
 
     string msg = "";
@@ -237,12 +239,15 @@ void strat_3(TCPclient* c){     //bei Treffer Schiff systematisch abarbeiten, an
     }   //end while (true)
 }   //end strat_3
 
+};  //end_class
+
 int main(){
 	srand(time(nullptr));
 
-    TCPclient client;
+    TCPclient myClient;
+    client myc1ient;
 	string host = "localhost";
-	bool success = client.conn(host , 2022);   // Verbindung aufbauen
+	bool success = myClient.conn(host , 2022);   // Verbindung aufbauen
     if (!success){return 0;}    //Beenden, wenn verbindung nicht aufgebaut werden konnte
     while (1){
         int currentStrat = 0;
@@ -265,8 +270,8 @@ int main(){
         else if(userCmd == 'q'){            //Auf Befehl zum Beenden des Clients und Schließen der Serververbindung überprüfen
             cout << "Programm wird beendet." << endl;
             msg = "BYEBYE";
-            client.sendData(msg);
-            msg = client.receive(32);
+            myClient.sendData(msg);
+            msg = myClient.receive(32);
             return 0;
         }
         else{
@@ -275,13 +280,14 @@ int main(){
 
         //Aufruf der in ausgwählten Strategie mit Übergabe des Clients
         if (currentStrat == 1){
-            strat_1(&client);
+            myc1ient.strat_1(&myClient);
         }
         else if (currentStrat == 2){
-            strat_2(&client);
+            myc1ient.strat_2(&myClient);
         }
         else if (currentStrat == 3){
-            strat_3(&client);
+            myc1ient.strat_3(&myClient);
         }
 	}
 }
+
